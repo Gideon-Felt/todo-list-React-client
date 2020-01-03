@@ -34,7 +34,12 @@ class TodoItem extends Component {
         defaultChecked={this.state.done}
         onClick={this.toggleDone}
         />
-        <p className={this.state.done ? "done" : null}>{this.props.item.title}</p>
+        <p className={this.state.done ? "done" : null}>
+          {this.props.item.title}
+        </p>
+        <button onClick={() => this.props.deleteItem(this.props.item.id)}>
+          X
+        </button>
       </div>
     );
   }
