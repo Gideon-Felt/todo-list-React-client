@@ -61,6 +61,13 @@ class App extends React.Component {
     fetch(`http://localhost:5000/todo/${id}`, {
       method: "DELETE"
     })
+    .then(
+      this.setState({
+        todos: this.state.todos.filter(item => {
+          return item.id !== id
+        })
+      })
+    )
     .catch(error => console.log("DeleteItem Error ", error))
   }
 
