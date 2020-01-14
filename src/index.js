@@ -1,93 +1,78 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 
 import TodoItem from "./todo-item";
 import "./styles.css";
 
-class App extends React.Component {
-  constructor() {
-    super();
+function App() {
+  const [todo, setTodo] = useState('')
+  const [todos, setTodos] = useState([])
 
-    this.state = {
-      todo: "",
-      todos: []
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     fetch("http://localhost:5000/todos")
       .then(response => response.json())
       .then(data => {
-        this.setState({
-          todos: data
-        });
+        setTodos(data)
       });
-  }
+  }, [])
 
-  addTodo = e => {
+  const addTodo = e => {
     e.preventDefault();
     axios({
       method: "post",
       url: "http://localhost:5000/todo",
       headers: { "content-type": "application/json" },
       data: {
-        title: this.state.todo,
+        title: todo,
         done: false
       }
     })
       .then(data => {
-        this.setState({
-          todos: [...this.state.todos, data.data],
-          todo: ""
-        });
+        setTodos([...todos, data.data])
+        setTodo("")
       })
       .catch(error => console.log("Add todo Error: ", error));
   };
 
-  handleChange = e => {
-    this.setState({
-      todo: e.target.value
+  const handleChange = e => {
+    setTodo(e.target.value)
+  };
+
+  const renderTodos = () => {
+    return todos.map(item => {
+      return <TodoItem key={item.id} item={item} deleteItem={deleteItem}/>;
     });
   };
 
-  renderTodos = () => {
-    return this.state.todos.map(item => {
-      return <TodoItem key={item.id} item={item} deleteItem={this.deleteItem}/>;
-    });
-  };
-
-  deleteItem = id => {
+  const deleteItem = id => {
     fetch(`http://localhost:5000/todo/${id}`, {
       method: "DELETE"
     })
-    .then(
-      this.setState({
-        todos: this.state.todos.filter(item => {
+    .then(setTodos(todos.filter(item => {
           return item.id !== id
         })
-      })
+      )
     )
     .catch(error => console.log("DeleteItem Error ", error))
   }
 
-  render() {
-    return (
-      <div className="app">
-        <h1>ToDo List</h1>
-        <form className="add-todo" onSubmit={this.addTodo}>
-          <input
-            type="text"
-            placeholder="Add Todo"
-            onChange={this.handleChange}
-            value={this.state.todo}
-          />
-          <button type="submit">Add</button>
-        </form>
-        {this.renderTodos()}
-      </div>
-    );
-  }
+
+  return (
+    <div className="app">
+      <h1>ToDo List</h1>
+      <form className="add-todo" onSubmit={addTodo}>
+        <input
+          type="text"
+          placeholder="Add Todo"
+          onChange={handleChange}
+          value={todo}
+        />
+        <button type="submit">Add</button>
+      </form>
+      {renderTodos()}
+    </div>
+  );
 }
 
 const rootElement = document.getElementById("root");

@@ -1,48 +1,37 @@
-import React, { Component } from "react";
+import React, { useState} from "react";
 
-class TodoItem extends Component {
-  constructor(props) {
-    super(props);
+function TodoItem(props) {
+  const [done, setDone] = useState(props.item.done)
 
-    this.state = {
-      done: props.item.done
-    }
-
-  }
-
-  toggleDone = () => {
-    fetch(`http://localhost:5000/todo/${this.props.item.id}`, {
+  const toggleDone = () => {
+    fetch(`http://localhost:5000/todo/${props.item.id}`, {
       method:"PATCH",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        done: !this.state.done
+        done: !done
       })
     })
     .then(
-      this.setState({
-        done: !this.state.done
-      })
+      setDone(!done)
     )
-    .catch(error => console.log("setState Error: " + error))
+    .catch(error => console.log("setDone Error: " + error))
   }
 
-  render() {
-    console.log(this.props.item);
-    return (
-      <div className="todo-item">
-        <input type="checkbox"
-        defaultChecked={this.state.done}
-        onClick={this.toggleDone}
-        />
-        <p className={this.state.done ? "done" : null}>
-          {this.props.item.title}
-        </p>
-        <button onClick={() => this.props.deleteItem(this.props.item.id)}>
-          X
-        </button>
-      </div>
-    );
-  }
+
+  return (
+    <div className="todo-item">
+      <input type="checkbox"
+      defaultChecked={done}
+      onClick={toggleDone}
+      />
+      <p className={done ? "done" : null}>
+        {props.item.title}
+      </p>
+      <button onClick={() => props.deleteItem(props.item.id)}>
+        X
+      </button>
+    </div>
+  )
 }
 
 export default TodoItem;
