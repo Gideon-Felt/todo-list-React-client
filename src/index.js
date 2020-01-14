@@ -19,15 +19,11 @@ function App() {
 
   const addTodo = e => {
     e.preventDefault();
-    axios({
-      method: "post",
-      url: "http://localhost:5000/todo",
-      headers: { "content-type": "application/json" },
-      data: {
+    axios
+      .post("http://localhost:5000/todo", {
         title: todo,
         done: false
-      }
-    })
+      })
       .then(data => {
         setTodos([...todos, data.data])
         setTodo("")
